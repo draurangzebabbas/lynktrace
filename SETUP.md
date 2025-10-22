@@ -1,113 +1,188 @@
 # LynkTrace Setup Guide
 
-## Project Overview
-LynkTrace is a modern software testing platform with a beautiful landing page, authentication system, and dashboard interface.
+A complete guide to set up LynkTrace with Clerk authentication and Supabase database integration.
 
-## What's Included
+## 🚀 Quick Start
 
-### 🏠 Landing Page
-- **Hero Section**: Modern, responsive hero section with navigation
-- **Branding**: Customized for LynkTrace with proper messaging
-- **Navigation**: Links to login/signup pages
+### 1. Environment Variables
 
-### 🔐 Authentication Pages
-- **Login Page**: `/login` - Clean login form with social auth options
-- **Signup Page**: `/signup` - Registration form with password confirmation
-- **Cross-linking**: Forms link to each other for easy navigation
+Create a `.env.local` file in your project root:
 
-### 📊 Dashboard
-- **Dashboard Page**: `/dashboard` - Complete dashboard with sidebar, charts, and data tables
-- **Components**: Reusable UI components for data visualization
+```bash
+# Clerk Authentication
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_your_publishable_key
+CLERK_SECRET_KEY=sk_test_your_secret_key
+CLERK_WEBHOOK_SECRET=whsec_your_webhook_secret
 
-## Setup Instructions
+# Supabase Database
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+```
 
-### 1. Install Dependencies
+### 2. Get Your Keys
+
+#### Clerk Keys
+1. Go to [Clerk Dashboard](https://dashboard.clerk.com/)
+2. Navigate to **API Keys** section
+3. Copy your **Publishable Key** and **Secret Key**
+
+#### Supabase Keys
+1. Go to your [Supabase Project](https://supabase.com/dashboard)
+2. Navigate to **Settings** → **API**
+3. Copy your **Project URL**, **anon key**, and **service role key**
+
+#### Clerk Webhook Secret
+1. In Clerk Dashboard, go to **Webhooks**
+2. Create a new webhook endpoint: `https://your-domain.com/api/webhooks/clerk`
+3. Select events: `user.created`, `user.updated`, `user.deleted`
+4. Copy the **webhook secret**
+
+### 3. Database Setup
+
+Run this SQL in your Supabase SQL Editor:
+
+```sql
+-- Create users table to sync with Clerk
+CREATE TABLE IF NOT EXISTS users (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  clerk_id VARCHAR(255) UNIQUE NOT NULL,
+  email VARCHAR(255),
+  first_name VARCHAR(255),
+  last_name VARCHAR(255),
+  image_url TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Create index for faster lookups
+CREATE INDEX IF NOT EXISTS idx_users_clerk_id ON users(clerk_id);
+
+-- Auto-update timestamp function
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = NOW();
+    RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+-- Auto-update trigger
+CREATE TRIGGER update_users_updated_at 
+    BEFORE UPDATE ON users 
+    FOR EACH ROW 
+    EXECUTE FUNCTION update_updated_at_column();
+
+-- Enable Row Level Security
+ALTER TABLE users ENABLE ROW LEVEL SECURITY;
+
+-- Security policies
+CREATE POLICY "Users can view own profile" ON users
+    FOR SELECT USING (clerk_id = current_setting('request.jwt.claims', true)::json->>'sub');
+
+CREATE POLICY "Users can update own profile" ON users
+    FOR UPDATE USING (clerk_id = current_setting('request.jwt.claims', true)::json->>'sub');
+
+CREATE POLICY "Service role can manage users" ON users
+    FOR ALL USING (current_setting('role') = 'service_role');
+```
+
+### 4. Install Dependencies
+
 ```bash
 npm install
 ```
 
-### 2. Run Development Server
+### 5. Run Development Server
+
 ```bash
 npm run dev
 ```
 
-### 3. Access the Application
-- **Homepage**: http://localhost:3000
-- **Login**: http://localhost:3000/login
-- **Signup**: http://localhost:3000/signup
-- **Dashboard**: http://localhost:3000/dashboard
+## 🔧 Features Included
 
-## Project Structure
+- ✅ **Clerk Authentication**: Complete sign-in/sign-up with Clerk
+- ✅ **User Management**: UserButton component for authenticated users
+- ✅ **Database Sync**: Automatic user data synchronization with Supabase
+- ✅ **Webhook Integration**: Real-time user updates via webhooks
+- ✅ **Security**: Row Level Security (RLS) policies for data protection
+- ✅ **Modern UI**: Beautiful components with Tailwind CSS and shadcn/ui
+
+## 📁 Project Structure
 
 ```
 lynktrace/
 ├── app/
-│   ├── page.tsx              # Homepage with hero section
-│   ├── login/page.tsx        # Login page
-│   ├── signup/page.tsx       # Signup page
-│   ├── dashboard/page.tsx    # Dashboard page
-│   └── layout.tsx            # Root layout
+│   ├── api/webhooks/clerk/    # Webhook handler for Clerk events
+│   ├── dashboard/             # Protected dashboard pages
+│   └── layout.tsx            # Root layout with ClerkProvider
 ├── components/
-│   ├── hero-section.tsx     # Landing page hero
-│   ├── login-form.tsx        # Login form component
-│   ├── signup-form.tsx       # Signup form component
-│   ├── app-sidebar.tsx       # Dashboard sidebar
-│   └── ui/                   # Reusable UI components
-└── public/
-    └── herosectionmockupimage.png  # Dashboard preview image
+│   ├── ui/                    # Reusable UI components
+│   ├── header.tsx            # Navigation header
+│   └── hero-section.tsx      # Landing page hero
+├── lib/
+│   ├── auth.ts               # Authentication utilities
+│   ├── supabase.ts          # Supabase client configuration
+│   └── supabase-server.ts   # Server-side Supabase client
+├── supabase/
+│   └── migrations/           # Database migration files
+└── middleware.ts            # Clerk middleware for route protection
 ```
 
-## Features Implemented
+## 🛠️ How It Works
 
-### ✅ Navigation
-- Hero section with working navigation links
-- Login/Signup buttons in header
-- Cross-linking between auth pages
+1. **User Signs Up**: User creates account through Clerk
+2. **Webhook Triggered**: Clerk sends webhook to your app
+3. **Database Sync**: User data is automatically stored in Supabase
+4. **Real-time Updates**: Any user changes are synced via webhooks
+5. **Secure Access**: RLS policies ensure users only see their own data
 
-### ✅ Authentication UI
-- Modern login form with social auth options
-- Signup form with password confirmation
-- Proper form validation structure
-- Responsive design for mobile/desktop
+## 🚀 Deployment
 
-### ✅ Branding
-- Updated from "Acme Inc" to "LynkTrace"
-- Custom metadata and descriptions
-- Relevant content for software testing platform
+### Vercel (Recommended)
+1. Push your code to GitHub
+2. Connect your repository to Vercel
+3. Add environment variables in Vercel dashboard
+4. Deploy!
 
-### ✅ Dashboard
-- Complete dashboard with sidebar navigation
-- Interactive charts and data tables
-- Responsive layout
+### Other Platforms
+- Ensure your webhook URL is publicly accessible
+- Use HTTPS (required for Clerk webhooks)
+- Set all environment variables in your deployment platform
 
-## Next Steps
+## 🔍 Troubleshooting
 
-### 🔧 Development
-1. **Form Functionality**: Add form submission handlers
-2. **Authentication**: Implement actual auth logic
-3. **API Integration**: Connect to backend services
-4. **State Management**: Add user session management
+### Webhook Not Working?
+- ✅ Check webhook URL is accessible: `https://your-domain.com/api/webhooks/clerk`
+- ✅ Verify webhook secret matches your `.env.local`
+- ✅ Ensure HTTPS is enabled (required by Clerk)
+- ✅ Check deployment logs for webhook activity
 
-### 🎨 Customization
-1. **Colors**: Update theme colors in `globals.css`
-2. **Images**: Replace placeholder images with your assets
-3. **Content**: Update copy and messaging
-4. **Features**: Add more dashboard features
+### Database Issues?
+- ✅ Verify Supabase service role key is correct
+- ✅ Check RLS policies are properly configured
+- ✅ Ensure database migrations have run
 
-### 🚀 Deployment
-1. **Environment Variables**: Set up production configs
-2. **Database**: Connect to your database
-3. **Hosting**: Deploy to Vercel, Netlify, or your preferred platform
+### Authentication Issues?
+- ✅ Verify Clerk keys are correct
+- ✅ Check middleware configuration
+- ✅ Ensure protected routes are properly configured
 
-## Technologies Used
+## 📚 Additional Resources
 
-- **Next.js 15** - React framework
-- **TypeScript** - Type safety
-- **Tailwind CSS** - Styling
-- **shadcn/ui** - UI components
-- **Lucide React** - Icons
-- **Radix UI** - Accessible components
+- [Clerk Documentation](https://clerk.com/docs)
+- [Supabase Documentation](https://supabase.com/docs)
+- [Next.js Documentation](https://nextjs.org/docs)
+- [shadcn/ui Components](https://ui.shadcn.com/)
 
-## Support
+## 🎯 Next Steps
 
-For questions or issues, please refer to the component documentation or create an issue in the project repository.
+After setup is complete:
+1. Customize your dashboard components
+2. Add more user data fields as needed
+3. Implement additional features
+4. Deploy to production
+
+---
+
+**Need Help?** Check the troubleshooting section above or review the error logs in your deployment platform.

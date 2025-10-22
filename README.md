@@ -1,36 +1,44 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# LynkTrace
 
-## Getting Started
+A modern web application built with Next.js, featuring Clerk authentication and Supabase database integration.
 
-First, run the development server:
+## 🚀 Quick Start
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+1. **Clone the repository**
+2. **Install dependencies**: `npm install`
+3. **Set up environment variables** (see [SETUP.md](./SETUP.md))
+4. **Run development server**: `npm run dev`
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 📋 Setup
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+For detailed setup instructions, see [SETUP.md](./SETUP.md).
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🛠️ Tech Stack
 
-## Learn More
+- **Framework**: Next.js 15
+- **Authentication**: Clerk
+- **Database**: Supabase
+- **Styling**: Tailwind CSS + shadcn/ui
+- **Language**: TypeScript
 
-To learn more about Next.js, take a look at the following resources:
+## 📁 Project Structure
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- `app/` - Next.js app router pages and API routes
+- `components/` - Reusable React components
+- `lib/` - Utility functions and configurations
+- `supabase/` - Database migrations and configuration
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🔧 Features
 
-## Deploy on Vercel
+- ✅ User authentication with Clerk
+- ✅ Database synchronization with Supabase
+- ✅ Modern UI components
+- ✅ Responsive design
+- ✅ TypeScript support
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 📚 Documentation
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- [Setup Guide](./SETUP.md) - Complete setup instructions
+- [Next.js Docs](https://nextjs.org/docs)
+- [Clerk Docs](https://clerk.com/docs)
+- [Supabase Docs](https://supabase.com/docs)
