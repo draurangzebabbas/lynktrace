@@ -18,6 +18,14 @@ CLERK_WEBHOOK_SECRET=whsec_your_webhook_secret
 NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
 SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+
+# Backend API Configuration
+NEXT_PUBLIC_API_BASE_URL=http://localhost:3001  # For local development
+# NEXT_PUBLIC_API_BASE_URL=https://your-backend-url.onrender.com  # For production
+
+# Backend Server Configuration (for backend/.env.local if needed)
+PORT=3001
+NODE_ENV=production
 ```
 
 ### 2. Get Your Keys
@@ -87,17 +95,37 @@ CREATE POLICY "Service role can manage users" ON users
     FOR ALL USING (current_setting('role') = 'service_role');
 ```
 
-### 4. Install Dependencies
+### 4. Backend Setup
+
+The backend is located in the `backend/` folder and handles LinkedIn scraping:
 
 ```bash
+# Navigate to backend directory
+cd backend
+
+# Install backend dependencies
 npm install
+
+# Start backend server (in development)
+npm run dev
+
+# Or start in production mode
+npm start
 ```
 
-### 5. Run Development Server
+The backend will run on `http://localhost:3001` by default.
+
+### 5. Frontend Setup
 
 ```bash
+# Install frontend dependencies (from root directory)
+npm install
+
+# Run frontend development server
 npm run dev
 ```
+
+The frontend will run on `http://localhost:3000` by default.
 
 ## 🔧 Features Included
 
@@ -107,26 +135,34 @@ npm run dev
 - ✅ **Webhook Integration**: Real-time user updates via webhooks
 - ✅ **Security**: Row Level Security (RLS) policies for data protection
 - ✅ **Modern UI**: Beautiful components with Tailwind CSS and shadcn/ui
+- ✅ **LinkedIn Scraping**: Backend API for scraping LinkedIn profiles and posts
+- ✅ **Smart API Key Management**: Automatic key rotation and recovery
+- ✅ **Profile Management**: Save, update, and manage scraped profiles
 
 ## 📁 Project Structure
 
 ```
 lynktrace/
-├── app/
-│   ├── api/webhooks/clerk/    # Webhook handler for Clerk events
-│   ├── dashboard/             # Protected dashboard pages
-│   └── layout.tsx            # Root layout with ClerkProvider
+├── app/                      # Next.js frontend app
+│   ├── api/webhooks/clerk/   # Webhook handler for Clerk events
+│   ├── dashboard/            # Protected dashboard pages
+│   └── layout.tsx           # Root layout with ClerkProvider
+├── backend/                  # Express.js backend API
+│   ├── server.js            # Main backend server
+│   ├── package.json         # Backend dependencies
+│   └── README.md            # Backend documentation
 ├── components/
-│   ├── ui/                    # Reusable UI components
-│   ├── header.tsx            # Navigation header
-│   └── hero-section.tsx      # Landing page hero
+│   ├── ui/                   # Reusable UI components
+│   ├── header.tsx           # Navigation header
+│   └── hero-section.tsx     # Landing page hero
 ├── lib/
-│   ├── auth.ts               # Authentication utilities
-│   ├── supabase.ts          # Supabase client configuration
-│   └── supabase-server.ts   # Server-side Supabase client
+│   ├── auth.ts              # Authentication utilities
+│   ├── supabase.ts         # Supabase client configuration
+│   └── supabase-server.ts  # Server-side Supabase client
 ├── supabase/
-│   └── migrations/           # Database migration files
-└── middleware.ts            # Clerk middleware for route protection
+│   └── migrations/          # Database migration files
+├── .env.local              # Environment variables (all services)
+└── middleware.ts           # Clerk middleware for route protection
 ```
 
 ## 🛠️ How It Works
@@ -135,20 +171,39 @@ lynktrace/
 2. **Webhook Triggered**: Clerk sends webhook to your app
 3. **Database Sync**: User data is automatically stored in Supabase
 4. **Real-time Updates**: Any user changes are synced via webhooks
-5. **Secure Access**: RLS policies ensure users only see their own data
+5. **LinkedIn Scraping**: Frontend calls backend API to scrape LinkedIn profiles
+6. **Smart Key Management**: Backend automatically manages API keys and rotation
+7. **Profile Storage**: Scraped profiles are stored in Supabase database
+8. **Secure Access**: RLS policies ensure users only see their own data
 
 ## 🚀 Deployment
 
-### Vercel (Recommended)
+### Frontend (Vercel - Recommended)
 1. Push your code to GitHub
 2. Connect your repository to Vercel
-3. Add environment variables in Vercel dashboard
+3. Add environment variables in Vercel dashboard:
+   - All Clerk variables
+   - All Supabase variables
+   - `NEXT_PUBLIC_API_BASE_URL` (pointing to your backend)
 4. Deploy!
+
+### Backend (Render - Recommended)
+1. Connect your GitHub repository to Render
+2. Set build command: `npm install`
+3. Set start command: `npm start`
+4. Add environment variables in Render dashboard:
+   - `SUPABASE_URL`
+   - `SUPABASE_ANON_KEY`
+   - `SUPABASE_SERVICE_ROLE_KEY`
+   - `PORT=3001`
+   - `NODE_ENV=production`
+5. Deploy!
 
 ### Other Platforms
 - Ensure your webhook URL is publicly accessible
 - Use HTTPS (required for Clerk webhooks)
 - Set all environment variables in your deployment platform
+- Make sure frontend can reach backend API URL
 
 ## 🔍 Troubleshooting
 
@@ -167,6 +222,13 @@ lynktrace/
 - ✅ Verify Clerk keys are correct
 - ✅ Check middleware configuration
 - ✅ Ensure protected routes are properly configured
+
+### Backend API Issues?
+- ✅ Verify backend is running on correct port (3001)
+- ✅ Check `NEXT_PUBLIC_API_BASE_URL` points to correct backend URL
+- ✅ Ensure Supabase service role key is correct
+- ✅ Check backend logs for API key issues
+- ✅ Verify CORS settings allow your frontend domain
 
 ## 📚 Additional Resources
 
