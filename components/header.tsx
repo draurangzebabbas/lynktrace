@@ -3,6 +3,8 @@ import Link from 'next/link'
 import { Logo } from '@/components/logo'
 import { Menu, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { ThemeToggle } from '@/components/theme-toggle'
+import { SignInButton, SignUpButton, SignedIn, SignedOut, UserButton } from '@clerk/nextjs'
 import React from 'react'
 import { cn } from '@/lib/utils'
 
@@ -77,31 +79,55 @@ export const HeroHeader = () => {
                                 </ul>
                             </div>
                             <div className="flex w-full flex-col space-y-3 sm:flex-row sm:gap-3 sm:space-y-0 md:w-fit">
-                                <Button
-                                    asChild
-                                    variant="outline"
-                                    size="sm"
-                                    className={cn(isScrolled && 'lg:hidden')}>
-                                    <Link href="/login">
-                                        <span>Login</span>
-                                    </Link>
-                                </Button>
-                                <Button
-                                    asChild
-                                    size="sm"
-                                    className={cn(isScrolled && 'lg:hidden')}>
-                                    <Link href="/signup">
-                                        <span>Sign Up</span>
-                                    </Link>
-                                </Button>
-                                <Button
-                                    asChild
-                                    size="sm"
-                                    className={cn(isScrolled ? 'lg:inline-flex' : 'hidden')}>
-                                    <Link href="#">
-                                        <span>Get Started</span>
-                                    </Link>
-                                </Button>
+                                <div className="flex items-center gap-3">
+                                    <ThemeToggle />
+                                    <SignedOut>
+                                        <Button
+                                            asChild
+                                            variant="outline"
+                                            size="sm"
+                                            className={cn(isScrolled && 'lg:hidden')}>
+                                            <SignInButton mode="modal">
+                                                <span>Login</span>
+                                            </SignInButton>
+                                        </Button>
+                                        <Button
+                                            asChild
+                                            size="sm"
+                                            className={cn(isScrolled && 'lg:hidden')}>
+                                            <SignUpButton mode="modal">
+                                                <span>Sign Up</span>
+                                            </SignUpButton>
+                                        </Button>
+                                        <Button
+                                            asChild
+                                            size="sm"
+                                            className={cn(isScrolled ? 'lg:inline-flex' : 'hidden')}>
+                                            <SignUpButton mode="modal">
+                                                <span>Get Started</span>
+                                            </SignUpButton>
+                                        </Button>
+                                    </SignedOut>
+                                    <SignedIn>
+                                        <Button
+                                            asChild
+                                            variant="outline"
+                                            size="sm"
+                                            className="hidden lg:inline-flex">
+                                            <Link href="/dashboard">
+                                                <span>Dashboard</span>
+                                            </Link>
+                                        </Button>
+                                        <UserButton 
+                                            afterSignOutUrl="/"
+                                            appearance={{
+                                                elements: {
+                                                    avatarBox: "w-8 h-8"
+                                                }
+                                            }}
+                                        />
+                                    </SignedIn>
+                                </div>
                             </div>
                         </div>
                     </div>
