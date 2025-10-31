@@ -26,8 +26,12 @@ export default async function Page() {
       <AppSidebar variant="inset" />
       <SidebarInset>
         <SiteHeader />
+<<<<<<< HEAD
         <div className="flex flex-1 flex-col">
         </div>
+=======
+      
+>>>>>>> 9b453125c3e3a45131fa6ae1130716a7a67c4fac
       </SidebarInset>
     </SidebarProvider>
   )

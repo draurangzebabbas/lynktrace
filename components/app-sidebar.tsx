@@ -2,10 +2,22 @@
 
 import * as React from "react"
 import {
+<<<<<<< HEAD
   IconInnerShadowTop,
 } from "@tabler/icons-react"
 
 import { UserButton, SignedIn, useUser } from "@clerk/nextjs"
+=======
+  IconDashboard,
+  IconFileDescription,
+  IconKey,
+  IconUsers,
+  IconWebhook,
+} from "@tabler/icons-react"
+import { UserButton } from "@clerk/nextjs"
+import { LogoIcon } from "@/components/logo"
+import { NavMain } from "@/components/nav-main"
+>>>>>>> 9b453125c3e3a45131fa6ae1130716a7a67c4fac
 import {
   Sidebar,
   SidebarContent,
@@ -16,6 +28,39 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 
+<<<<<<< HEAD
+=======
+const data = {
+  navMain: [
+    {
+      title: "Dashboard",
+      url: "#",
+      icon: IconDashboard,
+    },
+    {
+      title: "Api Keys",
+      url: "#",
+      icon: IconKey,
+    },
+    {
+      title: "Scrapers",
+      url: "#",
+      icon: IconFileDescription,
+    },
+    {
+      title: "My Profiles",
+      url: "#",
+      icon: IconUsers,
+    },
+    {
+      title: "Webhook Guide",
+      url: "#",
+      icon: IconWebhook,
+    },
+  ],
+}
+
+>>>>>>> 9b453125c3e3a45131fa6ae1130716a7a67c4fac
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { user } = useUser()
 
@@ -29,14 +74,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               className="data-[slot=sidebar-menu-button]:!p-1.5"
             >
               <a href="#">
-                <IconInnerShadowTop className="!size-5" />
-                <span className="text-base font-semibold">Acme Inc.</span>
+                <LogoIcon />
+                <span className="text-base font-semibold">LynkTrace</span>
               </a>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
+<<<<<<< HEAD
       </SidebarContent>
       <SidebarFooter>
         <div className="flex items-center gap-3 p-4">
@@ -62,6 +108,20 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               </div>
             )}
           </SignedIn>
+=======
+        <NavMain items={data.navMain} />
+      </SidebarContent>
+      <SidebarFooter>
+        <div className="flex items-center gap-2 p-2">
+          <UserButton 
+            afterSignOutUrl="/"
+            appearance={{
+              elements: {
+                avatarBox: "w-8 h-8"
+              }
+            }}
+          />
+>>>>>>> 9b453125c3e3a45131fa6ae1130716a7a67c4fac
         </div>
       </SidebarFooter>
     </Sidebar>
